@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KDXbooks.lk | Sri Lanka's Online Bookshop</title>
+    <!-- PayHere Payment Gateway JS SDK -->
+    <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
     <style>
         * {
             margin: 0;
@@ -21,7 +23,7 @@
         header {
             background-color: #0f172a;
             color: #fff;
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -31,7 +33,7 @@
         }
 
         .logo {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #ffffff;
         }
@@ -40,14 +42,20 @@
             color: #f59e0b;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .search-bar {
             display: flex;
-            width: 45%;
+            width: 35%;
         }
 
         .search-bar input {
             width: 100%;
-            padding: 0.6rem 1rem;
+            padding: 0.5rem 0.8rem;
             border: 1px solid #334155;
             background-color: #1e293b;
             color: #fff;
@@ -56,7 +64,7 @@
         }
 
         .search-bar button {
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border: none;
             background-color: #f59e0b;
             color: #0f172a;
@@ -65,15 +73,23 @@
             font-weight: 700;
         }
 
-        .cart-icon {
+        .cart-icon, .menu-icon {
             position: relative;
             cursor: pointer;
             font-weight: 600;
             background: #1e293b;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.9rem;
             border-radius: 20px;
             border: 1px solid #334155;
             user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-icon {
+            font-size: 1.2rem;
+            padding: 0.4rem 0.8rem;
         }
 
         .cart-badge {
@@ -92,7 +108,7 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: white;
             text-align: center;
-            padding: 3.5rem 1rem;
+            padding: 3rem 1rem;
             margin-bottom: 2rem;
         }
 
@@ -205,8 +221,8 @@
             color: #0f172a;
         }
 
-        /* Cart Drawer */
-        .cart-drawer {
+        /* Slide Drawers (Cart & Navigation) */
+        .drawer {
             position: fixed;
             top: 0;
             right: -400px;
@@ -220,11 +236,11 @@
             flex-direction: column;
         }
 
-        .cart-drawer.open {
+        .drawer.open {
             right: 0;
         }
 
-        .cart-header {
+        .drawer-header {
             background: #0f172a;
             color: white;
             padding: 1.2rem;
@@ -241,11 +257,53 @@
             cursor: pointer;
         }
 
-        .cart-body {
+        .drawer-body {
             padding: 1rem;
             flex: 1;
             overflow-y: auto;
         }
+
+        /* User Orders Styles */
+        .order-tab-bar {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .order-tab {
+            flex: 1;
+            padding: 0.6rem 0.2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .order-tab.active {
+            color: #f59e0b;
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        .order-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .order-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-completed { background: #dcfce7; color: #15803d; }
 
         .cart-item {
             display: flex;
@@ -291,54 +349,21 @@
             overflow-y: auto;
         }
 
-        .checkout-modal.show {
-            display: block;
-        }
+        .checkout-modal.show { display: block; }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 5px;
-        }
-
-        .radio-group label {
-            font-weight: normal;
-            cursor: pointer;
-        }
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-group label { font-weight: normal; cursor: pointer; }
 
         .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1500;
-            display: none;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 1500; display: none;
         }
-
-        .overlay.show {
-            display: block;
-        }
+        .overlay.show { display: block; }
 
         footer {
             background-color: #0f172a;
@@ -349,12 +374,8 @@
         }
 
         .success-box {
-            background: #ecfdf5;
-            border: 1px solid #10b981;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            color: #065f46;
+            background: #ecfdf5; border: 1px solid #10b981;
+            padding: 1rem; border-radius: 8px; margin-top: 1rem; color: #065f46;
         }
     </style>
 </head>
@@ -363,11 +384,17 @@
     <header>
         <div class="logo">KDX<span>books.lk</span></div>
         <div class="search-bar">
-            <input type="text" id="searchInput" onkeyup="searchBooks()" placeholder="පොතේ නම, කර්තෘ සොයන්න...">
+            <input type="text" id="searchInput" onkeyup="searchBooks()" placeholder="සොයන්න...">
             <button>Search</button>
         </div>
-        <div class="cart-icon" onclick="toggleCart()">
-            🛒 Cart <span class="cart-badge" id="cartCount">0</span>
+        <div class="header-actions">
+            <div class="cart-icon" onclick="openDrawer('cartDrawer')">
+                🛒 <span class="cart-badge" id="cartCount">0</span>
+            </div>
+            <!-- Hamburger Menu Icon (3 Lines) -->
+            <div class="menu-icon" onclick="openDrawer('menuDrawer')">
+                ☰
+            </div>
         </div>
     </header>
 
@@ -390,12 +417,12 @@
 
     <!-- Cart Drawer -->
     <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
-    <div class="cart-drawer" id="cartDrawer">
-        <div class="cart-header">
+    <div class="drawer" id="cartDrawer">
+        <div class="drawer-header">
             <h3>ඔබගේ Cart එක</h3>
-            <button class="close-btn" onclick="toggleCart()">&times;</button>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
-        <div class="cart-body" id="cartItems">
+        <div class="drawer-body" id="cartItems">
             <p style="text-align: center; color: #64748b; margin-top: 2rem;">Cart එක හිස්ව පවතී.</p>
         </div>
         <div class="cart-footer">
@@ -404,11 +431,29 @@
         </div>
     </div>
 
+    <!-- Side Menu Drawer (My Orders Panel) -->
+    <div class="drawer" id="menuDrawer">
+        <div class="drawer-header">
+            <h3>මගේ ඇණවුම් (My Orders)</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
+        <div class="drawer-body">
+            <div class="order-tab-bar">
+                <div class="order-tab active" onclick="switchOrderTab('pending', this)">Pending</div>
+                <div class="order-tab" onclick="switchOrderTab('completed', this)">Completed</div>
+                <div class="order-tab" onclick="switchOrderTab('all', this)">All History</div>
+            </div>
+            <div id="ordersContainer">
+                <!-- Dynamic Orders History -->
+            </div>
+        </div>
+    </div>
+
     <!-- Checkout Modal Window -->
     <div class="checkout-modal" id="checkoutModal">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3>Checkout (ඇණවුම තහවුරු කිරීම)</h3>
-            <button class="close-btn" style="color:#0f172a;" onclick="closeCheckout()">&times;</button>
+            <button class="close-btn" style="color:#0f172a;" onclick="closeAllModals()">&times;</button>
         </div>
 
         <div id="checkoutFormContainer">
@@ -431,8 +476,8 @@
                 <div class="form-group">
                     <label>ගෙවීම් ක්‍රමය (Payment Method):</label>
                     <div class="radio-group">
-                        <label><input type="radio" name="payment" value="Cash on Delivery (COD)" checked> Cash on Delivery (COD)</label>
-                        <label><input type="radio" name="payment" value="Online Card Payment"> Card Payment</label>
+                        <label><input type="radio" name="payment" value="COD" checked> Cash on Delivery</label>
+                        <label><input type="radio" name="payment" value="CARD"> Card Payment 💳</label>
                     </div>
                 </div>
 
@@ -473,14 +518,16 @@
         ];
 
         let cart = [];
+        
+        // Mock Sample History Orders (Pending & Completed)
+        let orderHistory = [
+            { id: 'KDX-849201', items: 'ලැවෙන්ඩර්', amount: 1200, date: '2026-07-20', status: 'pending', payment: 'COD' },
+            { id: 'KDX-102938', items: 'ටීචර්, හීනය', amount: 2050, date: '2026-07-15', status: 'completed', payment: 'CARD' }
+        ];
 
         function renderBooks(booksToDisplay) {
             const grid = document.getElementById('bookGrid');
             grid.innerHTML = '';
-            if (booksToDisplay.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem;">පොත් හමුවූයේ නැත.</p>';
-                return;
-            }
             booksToDisplay.forEach(book => {
                 grid.innerHTML += `
                     <div class="book-card">
@@ -513,9 +560,17 @@
             updateCartUI();
         }
 
-        function toggleCart() {
-            document.getElementById('cartDrawer').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
+        function openDrawer(drawerId) {
+            closeAllModals();
+            document.getElementById(drawerId).classList.add('open');
+            document.getElementById('overlay').classList.add('show');
+            if(drawerId === 'menuDrawer') renderOrders('pending');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+            document.getElementById('checkoutModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
         }
 
         function updateCartUI() {
@@ -548,7 +603,44 @@
             updateCartUI();
         }
 
-        /* Checkout Modal Controls */
+        /* Order History Controls */
+        function switchOrderTab(status, element) {
+            document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            renderOrders(status);
+        }
+
+        function renderOrders(filterStatus) {
+            const container = document.getElementById('ordersContainer');
+            let filtered = orderHistory;
+            if(filterStatus !== 'all') {
+                filtered = orderHistory.filter(o => o.status === filterStatus);
+            }
+
+            if(filtered.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:1.5rem;">ඇණවුම් කිසිවක් නැත.</p>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(o => {
+                const badge = o.status === 'pending' ? '<span class="order-badge badge-pending">Pending</span>' : '<span class="order-badge badge-completed">Completed</span>';
+                html += `
+                    <div class="order-card">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <strong>#${o.id}</strong>
+                            ${badge}
+                        </div>
+                        <div><strong>පොත්:</strong> ${o.items}</div>
+                        <div><strong>මුදල:</strong> Rs. ${o.amount} (${o.payment})</div>
+                        <div style="color:#64748b; font-size:0.75rem; margin-top:4px;">දිනය: ${o.date}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        /* Checkout & Payment Integration Logic */
         function openCheckout() {
             if (cart.length === 0) {
                 alert('කරුණාකර පළමුව පොතක් Cart එකට එකතු කරන්න.');
@@ -556,29 +648,73 @@
             }
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             document.getElementById('checkoutTotal').innerText = total;
-            document.getElementById('cartDrawer').classList.remove('open');
+            closeAllModals();
             document.getElementById('checkoutModal').classList.add('show');
             document.getElementById('overlay').classList.add('show');
         }
 
-        function closeCheckout() {
-            document.getElementById('checkoutModal').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
-        }
-
-        function closeAllModals() {
-            document.getElementById('cartDrawer').classList.remove('open');
-            document.getElementById('checkoutModal').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
-        }
-
-        /* Process Order & Generate Unique Order ID */
         function processOrder(e) {
             e.preventDefault();
-            
-            // Random Unique Order Number Generation
+            const payMethod = document.querySelector('input[name="payment"]:checked').value;
+            const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
             const orderId = 'KDX-' + Math.floor(100000 + Math.random() * 900000);
-            
+
+            if(payMethod === 'CARD') {
+                // Trigger Online Card Payment (PayHere Gateway Popup)
+                payWithPayHere(orderId, totalAmount);
+            } else {
+                // COD Flow
+                finalizeOrder(orderId, totalAmount, 'COD');
+            }
+        }
+
+        // Online Card Payment Function
+        function payWithPayHere(orderId, amount) {
+            var payment = {
+                "sandbox": true, // Test mode (Production එකේදී false කරන්න)
+                "merchant_id": "121XXXX", // ඔබගේ PayHere Merchant ID එක මෙතැනට දමන්න
+                "return_url": "https://kdxbooks.lk",
+                "cancel_url": "https://kdxbooks.lk",
+                "notify_url": "https://kdxbooks.lk",
+                "order_id": orderId,
+                "items": "Book Purchase",
+                "amount": amount,
+                "currency": "LKR",
+                "first_name": document.getElementById('custName').value,
+                "last_name": "",
+                "email": "customer@gmail.com",
+                "phone": document.getElementById('custPhone').value,
+                "address": document.getElementById('custAddress').value,
+                "city": "Colombo",
+                "country": "Sri Lanka"
+            };
+
+            payhere.startPayment(payment);
+
+            payhere.onCompleted = function onCompleted(orderId) {
+                finalizeOrder(orderId, amount, 'CARD');
+            };
+
+            payhere.onDismissed = function onDismissed() {
+                alert("Payment එක අවලංගු විය. නැවත උත්සාහ කරන්න.");
+            };
+
+            payhere.onError = function onError(error) {
+                alert("Card Payment Error: " + error);
+            };
+        }
+
+        function finalizeOrder(orderId, amount, paymentType) {
+            const itemNames = cart.map(i => i.title).join(', ');
+            orderHistory.unshift({
+                id: orderId,
+                items: itemNames,
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                status: 'pending',
+                payment: paymentType
+            });
+
             document.getElementById('displayOrderId').innerText = '#' + orderId;
             document.getElementById('checkoutFormContainer').style.display = 'none';
             document.getElementById('successContainer').style.display = 'block';
