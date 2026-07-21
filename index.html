@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KDXbooks.lk | Sri Lanka's Online Bookshop</title>
     <style>
-        /* Base Reset & Fonts */
         * {
             margin: 0;
             padding: 0;
@@ -29,18 +28,16 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
             font-size: 1.6rem;
             font-weight: 800;
             color: #ffffff;
-            letter-spacing: -0.5px;
         }
 
         .logo span {
-            color: #f59e0b; /* Accent Color */
+            color: #f59e0b;
         }
 
         .search-bar {
@@ -58,10 +55,6 @@
             outline: none;
         }
 
-        .search-bar input::placeholder {
-            color: #94a3b8;
-        }
-
         .search-bar button {
             padding: 0.6rem 1.2rem;
             border: none;
@@ -70,11 +63,6 @@
             cursor: pointer;
             border-radius: 0 6px 6px 0;
             font-weight: 700;
-            transition: background 0.2s;
-        }
-
-        .search-bar button:hover {
-            background-color: #d97706;
         }
 
         .cart-icon {
@@ -85,6 +73,7 @@
             padding: 0.5rem 1rem;
             border-radius: 20px;
             border: 1px solid #334155;
+            user-select: none;
         }
 
         .cart-badge {
@@ -107,25 +96,13 @@
             margin-bottom: 2rem;
         }
 
-        .hero h1 {
-            font-size: 2.4rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .hero p {
-            color: #cbd5e1;
-            font-size: 1.1rem;
-        }
-
-        /* Main Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
         }
 
-        /* Categories Filter Bar */
+        /* Category Filter Chips */
         .category-bar {
             display: flex;
             gap: 10px;
@@ -142,8 +119,8 @@
             font-weight: 600;
             color: #475569;
             cursor: pointer;
-            white-space: nowrap;
             border: 1px solid #e2e8f0;
+            user-select: none;
             transition: all 0.2s;
         }
 
@@ -161,7 +138,7 @@
             padding-left: 10px;
         }
 
-        /* Book Grid Section */
+        /* Book Grid Layout */
         .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -172,23 +149,17 @@
         .book-card {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             padding: 1rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s, box-shadow 0.2s;
             border: 1px solid #e2e8f0;
-        }
-
-        .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .book-cover {
             width: 100%;
-            height: 260px;
+            height: 280px;
             object-fit: cover;
             border-radius: 6px;
             margin-bottom: 1rem;
@@ -196,9 +167,8 @@
         }
 
         .book-title {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.2rem;
             color: #0f172a;
         }
 
@@ -212,7 +182,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: auto;
         }
 
         .price {
@@ -228,9 +197,8 @@
             padding: 0.5rem 0.9rem;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
             font-weight: 600;
-            transition: background-color 0.2s;
+            transition: background 0.2s;
         }
 
         .add-cart-btn:hover {
@@ -238,128 +206,291 @@
             color: #0f172a;
         }
 
-        /* Footer */
+        /* Cart Sidebar Drawer */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-drawer.open {
+            right: 0;
+        }
+
+        .cart-header {
+            background: #0f172a;
+            color: white;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-body {
+            padding: 1rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cart-footer {
+            padding: 1.2rem;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
         footer {
             background-color: #0f172a;
             color: #94a3b8;
             text-align: center;
             padding: 2rem 1rem;
             margin-top: 3rem;
-            border-top: 1px solid #1e293b;
-        }
-
-        footer strong {
-            color: #fff;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            .search-bar {
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
     <header>
         <div class="logo">KDX<span>books.lk</span></div>
         <div class="search-bar">
-            <input type="text" placeholder="පොතේ නම, කර්තෘ හෝ ISBN අංකය සොයන්න...">
+            <input type="text" id="searchInput" onkeyup="searchBooks()" placeholder="පොතේ නම, කර්තෘ සොයන්න...">
             <button>Search</button>
         </div>
-        <div class="cart-icon">
+        <div class="cart-icon" onclick="toggleCart()">
             🛒 Cart <span class="cart-badge" id="cartCount">0</span>
         </div>
     </header>
 
-    <!-- Hero Banner -->
     <section class="hero">
         <h1>Welcome to KDXbooks.lk</h1>
         <p>ඔබට අවශ්‍ය සියලුම පොත් නිවසටම ගෙන්නා ගන්න</p>
     </section>
 
-    <!-- Main Content Container -->
     <main class="container">
-
-        <!-- Category Filters -->
+        <!-- Category Filter Chips -->
         <div class="category-bar">
-            <div class="cat-chip active">සියල්ල (All)</div>
-            <div class="cat-chip">නවකතා</div>
-            <div class="cat-chip">පරිවර්තන</div>
-            <div class="cat-chip">අධ්‍යාපනික</div>
-            <div class="cat-chip">ළමා පොත්</div>
-            <div class="cat-chip">Self-Help</div>
+            <div class="cat-chip active" onclick="filterCategory('All', this)">සියල්ල (All)</div>
+            <div class="cat-chip" onclick="filterCategory('නවකතා', this)">නවකතා</div>
+            <div class="cat-chip" onclick="filterCategory('පද්‍ය/පද සංකලන', this)">පද්‍ය/පද සංකලන</div>
+            <div class="cat-chip" onclick="filterCategory('හාස්‍ය', this)">හාස්‍ය</div>
         </div>
 
-        <h2 class="section-title">නවගමනයන් (New Arrivals)</h2>
+        <h2 class="section-title" id="sectionTitle">සියලුම පොත් (All Books)</h2>
         
-        <div class="book-grid">
-
-            <!-- Book Card 1 -->
-            <div class="book-card">
-                <img src="https://via.placeholder.com/200x300?text=KDX+Book+1" alt="Book Cover" class="book-cover">
-                <div class="book-title">මඩෝල් දූව</div>
-                <div class="book-author">මාර්ටින් වික්‍රමසිංහ</div>
-                <div class="book-price-row">
-                    <span class="price">Rs. 850</span>
-                    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Book Card 2 -->
-            <div class="book-card">
-                <img src="https://via.placeholder.com/200x300?text=KDX+Book+2" alt="Book Cover" class="book-cover">
-                <div class="book-title">අම්මා</div>
-                <div class="book-author">මැක්සිම් ගෝර්කි</div>
-                <div class="book-price-row">
-                    <span class="price">Rs. 1,200</span>
-                    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Book Card 3 -->
-            <div class="book-card">
-                <img src="https://via.placeholder.com/200x300?text=KDX+Book+3" alt="Book Cover" class="book-cover">
-                <div class="book-title">Atomic Habits</div>
-                <div class="book-author">James Clear</div>
-                <div class="book-price-row">
-                    <span class="price">Rs. 2,400</span>
-                    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Book Card 4 -->
-            <div class="book-card">
-                <img src="https://via.placeholder.com/200x300?text=KDX+Book+4" alt="Book Cover" class="book-cover">
-                <div class="book-title">Rich Dad Poor Dad</div>
-                <div class="book-author">Robert Kiyosaki</div>
-                <div class="book-price-row">
-                    <span class="price">Rs. 1,950</span>
-                    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-                </div>
-            </div>
-
+        <!-- Dynamic Book Grid -->
+        <div class="book-grid" id="bookGrid">
+            <!-- Books inserted dynamically -->
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Cart Sidebar Drawer -->
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>ඔබගේ Cart එක</h3>
+            <button class="close-btn" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-body" id="cartItems">
+            <p style="text-align: center; color: #64748b; margin-top: 2rem;">Cart එක හිස්ව පවතී.</p>
+        </div>
+        <div class="cart-footer">
+            <h4>එකතුව (Total): Rs. <span id="cartTotal">0</span></h4>
+            <button class="checkout-btn" onclick="alert('Checkout Process එකට යොමු කෙරේ!')">Buy Now / Checkout</button>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 <strong>KDXbooks.lk</strong>. All rights reserved.</p>
     </footer>
 
-    <!-- Interactive JavaScript -->
     <script>
-        let count = 0;
-        function addToCart() {
-            count++;
-            document.getElementById("cartCount").innerText = count;
+        // Updated Books Dataset based on provided images
+        const books = [
+            { 
+                id: 1, 
+                title: 'ලැවෙන්ඩර්', 
+                author: 'හසිඳු නිලෝත් තිසේරා', 
+                price: 1200, 
+                category: 'නවකතා', 
+                img: 'https://via.placeholder.com/200x300?text=Lavender' 
+            },
+            { 
+                id: 2, 
+                title: 'කවර්', 
+                author: 'මහින්ද රත්නායක', 
+                price: 950, 
+                category: 'හාස්‍ය', 
+                img: 'https://via.placeholder.com/200x300?text=Cover' 
+            },
+            { 
+                id: 3, 
+                title: 'ඒත් මං ආදරෙයි', 
+                author: 'අබ්දුල් උමර් / සගන් නෙත්මිණ', 
+                price: 850, 
+                category: 'පද්‍ය/පද සංකලන', 
+                img: 'https://via.placeholder.com/200x300?text=Eeth+Man+Adarei' 
+            },
+            { 
+                id: 4, 
+                title: 'හීනය', 
+                author: 'Kavinda D Senanayaka', 
+                price: 1100, 
+                category: 'නවකතා', 
+                img: 'https://via.placeholder.com/200x300?text=Heenaya' 
+            }
+        ];
+
+        let cart = [];
+
+        // Render books in UI
+        function renderBooks(booksToDisplay) {
+            const grid = document.getElementById('bookGrid');
+            grid.innerHTML = '';
+
+            if (booksToDisplay.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem;">මේ Category එකට අදාළ පොත් හමුවූයේ නැත.</p>';
+                return;
+            }
+
+            booksToDisplay.forEach(book => {
+                grid.innerHTML += `
+                    <div class="book-card">
+                        <img src="${book.img}" alt="${book.title}" class="book-cover">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">${book.author}</div>
+                        <div class="book-price-row">
+                            <span class="price">Rs. ${book.price}</span>
+                            <button class="add-cart-btn" onclick="addToCart('${book.title}', ${book.price})">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
+
+        // Category Filter Logic
+        function filterCategory(category, element) {
+            const chips = document.querySelectorAll('.cat-chip');
+            chips.forEach(chip => chip.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('sectionTitle').innerText = category === 'All' ? 'සියලුම පොත් (All Books)' : category;
+
+            if (category === 'All') {
+                renderBooks(books);
+            } else {
+                const filtered = books.filter(b => b.category === category);
+                renderBooks(filtered);
+            }
+        }
+
+        // Real-time Search
+        function searchBooks() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const searched = books.filter(b => 
+                b.title.toLowerCase().includes(query) || 
+                b.author.toLowerCase().includes(query)
+            );
+            renderBooks(searched);
+        }
+
+        // Shopping Cart Controls
+        function addToCart(title, price) {
+            cart.push({ title, price });
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            document.getElementById('cartDrawer').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            const cartItemsContainer = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 2rem;">Cart එක හිස්ව පවතී.</p>';
+                document.getElementById('cartTotal').innerText = 0;
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.title}</strong><br>
+                            <small style="color: #059669;">Rs. ${item.price}</small>
+                        </div>
+                        <button onclick="removeFromCart(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">X</button>
+                    </div>
+                `;
+            });
+
+            cartItemsContainer.innerHTML = html;
+            document.getElementById('cartTotal').innerText = total;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // Initial Load
+        renderBooks(books);
     </script>
 </body>
 </html>
