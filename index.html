@@ -138,7 +138,7 @@
             padding-left: 10px;
         }
 
-        /* Book Grid Layout */
+        /* Book Grid */
         .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -198,7 +198,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.2s;
         }
 
         .add-cart-btn:hover {
@@ -206,7 +205,7 @@
             color: #0f172a;
         }
 
-        /* Cart Sidebar Drawer */
+        /* Cart Drawer */
         .cart-drawer {
             position: fixed;
             top: 0;
@@ -274,6 +273,58 @@
             margin-top: 1rem;
         }
 
+        /* Checkout Modal */
+        .checkout-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 2500;
+            display: none;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .checkout-modal.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+
         .overlay {
             position: fixed;
             top: 0;
@@ -296,6 +347,15 @@
             padding: 2rem 1rem;
             margin-top: 3rem;
         }
+
+        .success-box {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            color: #065f46;
+        }
     </style>
 </head>
 <body>
@@ -317,7 +377,6 @@
     </section>
 
     <main class="container">
-        <!-- Category Filter Chips -->
         <div class="category-bar">
             <div class="cat-chip active" onclick="filterCategory('All', this)">සියල්ල (All)</div>
             <div class="cat-chip" onclick="filterCategory('නවකතා', this)">නවකතා</div>
@@ -326,15 +385,11 @@
         </div>
 
         <h2 class="section-title" id="sectionTitle">සියලුම පොත් (All Books)</h2>
-        
-        <!-- Dynamic Book Grid -->
-        <div class="book-grid" id="bookGrid">
-            <!-- Books inserted dynamically -->
-        </div>
+        <div class="book-grid" id="bookGrid"></div>
     </main>
 
-    <!-- Cart Sidebar Drawer -->
-    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+    <!-- Cart Drawer -->
+    <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
     <div class="cart-drawer" id="cartDrawer">
         <div class="cart-header">
             <h3>ඔබගේ Cart එක</h3>
@@ -345,7 +400,63 @@
         </div>
         <div class="cart-footer">
             <h4>එකතුව (Total): Rs. <span id="cartTotal">0</span></h4>
-            <button class="checkout-btn" onclick="alert('Checkout Process එකට යොමු කෙරේ!')">Buy Now / Checkout</button>
+            <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal Window -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Checkout (ඇණවුම තහවුරු කිරීම)</h3>
+            <button class="close-btn" style="color:#0f172a;" onclick="closeCheckout()">&times;</button>
+        </div>
+
+        <div id="checkoutFormContainer">
+            <form id="orderForm" onsubmit="processOrder(event)">
+                <div class="form-group">
+                    <label>ඔබගේ නම (Full Name):</label>
+                    <input type="text" id="custName" required placeholder="Ex: Nimal Perera">
+                </div>
+
+                <div class="form-group">
+                    <label>දුරකථන අංකය (Phone Number):</label>
+                    <input type="tel" id="custPhone" required placeholder="07X XXXXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>ලිපිනය (Delivery Address):</label>
+                    <textarea id="custAddress" rows="2" required placeholder="ඔබගේ නිවැරදි ලිපිනය..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>ගෙවීම් ක්‍රමය (Payment Method):</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="payment" value="Cash on Delivery (COD)" checked> Cash on Delivery (COD)</label>
+                        <label><input type="radio" name="payment" value="Online Card Payment"> Card Payment</label>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <strong>ගෙවිය යුතු මුළු මුදල: Rs. <span id="checkoutTotal">0</span></strong>
+                </div>
+
+                <button type="submit" class="checkout-btn" style="background:#0f172a;">Order එක Confirm කරන්න</button>
+            </form>
+        </div>
+
+        <!-- Success Message Screen -->
+        <div id="successContainer" style="display: none; text-align: center;">
+            <div style="font-size: 3rem;">🎉</div>
+            <h2 style="color: #16a34a; margin-bottom: 0.5rem;">ඇණවුම සාර්ථකයි!</h2>
+            <p>ඔබගේ Order Number එක:</p>
+            <h3 style="background: #e2e8f0; display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; margin: 0.5rem 0;" id="displayOrderId">#KDX-0000</h3>
+            
+            <div class="success-box">
+                <p><strong>කරුණාකර මෙම Order Number එක පහත අංකයට WhatsApp හෝ SMS හරහා යොමු කරන්න:</strong></p>
+                <h3 style="margin-top: 5px; color: #0f172a;">📞 078 167 5516</h3>
+            </div>
+
+            <button class="checkout-btn" onclick="finishOrder()" style="background:#f59e0b; color:#0f172a; margin-top:1.5rem;">හරි (Close)</button>
         </div>
     </div>
 
@@ -354,54 +465,22 @@
     </footer>
 
     <script>
-        // Updated Books Dataset based on provided images
         const books = [
-            { 
-                id: 1, 
-                title: 'ලැවෙන්ඩර්', 
-                author: 'හසිඳු නිලෝත් තිසේරා', 
-                price: 1200, 
-                category: 'නවකතා', 
-                img: 'https://via.placeholder.com/200x300?text=Lavender' 
-            },
-            { 
-                id: 2, 
-                title: 'කවර්', 
-                author: 'මහින්ද රත්නායක', 
-                price: 950, 
-                category: 'හාස්‍ය', 
-                img: 'https://via.placeholder.com/200x300?text=Cover' 
-            },
-            { 
-                id: 3, 
-                title: 'ඒත් මං ආදරෙයි', 
-                author: 'අබ්දුල් උමර් / සගන් නෙත්මිණ', 
-                price: 850, 
-                category: 'පද්‍ය/පද සංකලන', 
-                img: 'https://via.placeholder.com/200x300?text=Eeth+Man+Adarei' 
-            },
-            { 
-                id: 4, 
-                title: 'හීනය', 
-                author: 'Kavinda D Senanayaka', 
-                price: 1100, 
-                category: 'නවකතා', 
-                img: 'https://via.placeholder.com/200x300?text=Heenaya' 
-            }
+            { id: 1, title: 'ලැවෙන්ඩර්', author: 'හසිඳු නිලෝත් තිසේරා', price: 1200, category: 'නවකතා', img: 'https://via.placeholder.com/200x300?text=Lavender' },
+            { id: 2, title: 'ටීචර්', author: 'එරන්ද රත්නසේකර', price: 950, category: 'හාස්‍ය', img: 'https://via.placeholder.com/200x300?text=Teacher' },
+            { id: 3, title: 'ඒත් මං ආදරෙයි', author: 'අබ්දුල් උමර් / සගන් නෙත්මිණ', price: 850, category: 'පද්‍ය/පද සංකලන', img: 'https://via.placeholder.com/200x300?text=Eeth+Man+Adarei' },
+            { id: 4, title: 'හීනය', author: 'Kavinda D Senanayaka', price: 1100, category: 'නවකතා', img: 'https://via.placeholder.com/200x300?text=Heenaya' }
         ];
 
         let cart = [];
 
-        // Render books in UI
         function renderBooks(booksToDisplay) {
             const grid = document.getElementById('bookGrid');
             grid.innerHTML = '';
-
             if (booksToDisplay.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem;">මේ Category එකට අදාළ පොත් හමුවූයේ නැත.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem;">පොත් හමුවූයේ නැත.</p>';
                 return;
             }
-
             booksToDisplay.forEach(book => {
                 grid.innerHTML += `
                     <div class="book-card">
@@ -417,33 +496,18 @@
             });
         }
 
-        // Category Filter Logic
         function filterCategory(category, element) {
-            const chips = document.querySelectorAll('.cat-chip');
-            chips.forEach(chip => chip.classList.remove('active'));
+            document.querySelectorAll('.cat-chip').forEach(chip => chip.classList.remove('active'));
             element.classList.add('active');
-
             document.getElementById('sectionTitle').innerText = category === 'All' ? 'සියලුම පොත් (All Books)' : category;
-
-            if (category === 'All') {
-                renderBooks(books);
-            } else {
-                const filtered = books.filter(b => b.category === category);
-                renderBooks(filtered);
-            }
+            renderBooks(category === 'All' ? books : books.filter(b => b.category === category));
         }
 
-        // Real-time Search
         function searchBooks() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const searched = books.filter(b => 
-                b.title.toLowerCase().includes(query) || 
-                b.author.toLowerCase().includes(query)
-            );
-            renderBooks(searched);
+            renderBooks(books.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query)));
         }
 
-        // Shopping Cart Controls
         function addToCart(title, price) {
             cart.push({ title, price });
             updateCartUI();
@@ -456,17 +520,13 @@
 
         function updateCartUI() {
             document.getElementById('cartCount').innerText = cart.length;
-            const cartItemsContainer = document.getElementById('cartItems');
-            
+            const container = document.getElementById('cartItems');
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 2rem;">Cart එක හිස්ව පවතී.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 2rem;">Cart එක හිස්ව පවතී.</p>';
                 document.getElementById('cartTotal').innerText = 0;
                 return;
             }
-
-            let html = '';
-            let total = 0;
-
+            let html = '', total = 0;
             cart.forEach((item, index) => {
                 total += item.price;
                 html += `
@@ -479,8 +539,7 @@
                     </div>
                 `;
             });
-
-            cartItemsContainer.innerHTML = html;
+            container.innerHTML = html;
             document.getElementById('cartTotal').innerText = total;
         }
 
@@ -489,7 +548,51 @@
             updateCartUI();
         }
 
-        // Initial Load
+        /* Checkout Modal Controls */
+        function openCheckout() {
+            if (cart.length === 0) {
+                alert('කරුණාකර පළමුව පොතක් Cart එකට එකතු කරන්න.');
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('checkoutTotal').innerText = total;
+            document.getElementById('cartDrawer').classList.remove('open');
+            document.getElementById('checkoutModal').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function closeAllModals() {
+            document.getElementById('cartDrawer').classList.remove('open');
+            document.getElementById('checkoutModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        /* Process Order & Generate Unique Order ID */
+        function processOrder(e) {
+            e.preventDefault();
+            
+            // Random Unique Order Number Generation
+            const orderId = 'KDX-' + Math.floor(100000 + Math.random() * 900000);
+            
+            document.getElementById('displayOrderId').innerText = '#' + orderId;
+            document.getElementById('checkoutFormContainer').style.display = 'none';
+            document.getElementById('successContainer').style.display = 'block';
+        }
+
+        function finishOrder() {
+            cart = [];
+            updateCartUI();
+            document.getElementById('checkoutFormContainer').style.display = 'block';
+            document.getElementById('successContainer').style.display = 'none';
+            document.getElementById('orderForm').reset();
+            closeAllModals();
+        }
+
         renderBooks(books);
     </script>
 </body>
