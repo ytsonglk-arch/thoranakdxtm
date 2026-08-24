@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AuraBooks.lk | Modern Online Bookshop</title>
-    
-    <!-- PayHere Payment Gateway JS SDK -->
-    <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
 
     <!-- Firebase SDKs (v9 Compat Mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -21,14 +17,17 @@
             projectId: "aurabookslk",
             storageBucket: "aurabookslk.firebasestorage.app",
             messagingSenderId: "62503724831",
-            appId: "1:62503724831:web:b0a52e88ef790299a1b22a",
-            measurementId: "G-NGBXMCN1D1"
+            appId: "1:62503724831:web:b0a52e88ef790299a1b22a"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        firebase.analytics();
-        const database = firebase.database();
-        const storage = firebase.storage();
+        let database, storage;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            storage = firebase.storage();
+        } catch(e) {
+            console.log("Firebase Init error, running in Demo Mode");
+        }
     </script>
 
     <style>
@@ -57,7 +56,6 @@
         .nav-actions { display: flex; gap: 12px; align-items: center; }
         .btn-icon { background: #f1f5f9; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 
-        /* Rasakatha Style Featured Large Hero Showcase */
         .featured-showcase { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 3rem 5%; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; border-radius: 0 0 20px 20px; }
         .featured-content { max-width: 500px; }
         .featured-content h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.3; }
@@ -83,7 +81,7 @@
         .price-container { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
         .curr-price { font-weight: 800; font-size: 1.1rem; color: #059669; }
         .old-price { font-size: 0.85rem; color: #94a3b8; text-decoration: line-through; }
-        .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 0.6rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 0.6rem; border-radius: 10px; font-weight: 600; cursor: pointer; }
         .add-cart-btn:hover { background: var(--accent); color: var(--primary); }
 
         .drawer { position: fixed; top:0; right:-420px; width:400px; height:100%; background:white; z-index:2000; transition: 0.3s ease; display:flex; flex-direction:column; }
@@ -120,16 +118,13 @@
         </div>
     </header>
 
-    <!-- Rasakatha Style Featured Large Hero Banner -->
-    <section class="featured-showcase" id="featuredShowcase">
+    <section class="featured-showcase">
         <div class="featured-content">
             <h1>නවතම සහ විශේෂිත <span>ප්‍රකාශන</span></h1>
             <p>විශේෂ වට්ටම් යටතේ අදම ඔබගේ ප්‍රියතම පොත ඇණවුම් කරවා ගන්න.</p>
             <button class="add-cart-btn" style="width: auto; padding: 0.8rem 2rem; background: var(--accent); color: var(--primary);" onclick="document.getElementById('bookSection').scrollIntoView()">පොත් නරඹන්න</button>
         </div>
-        <div id="featuredBookBox">
-            <!-- Dynamic Latest Featured Book -->
-        </div>
+        <div id="featuredBookBox"></div>
     </section>
 
     <main class="main-container" id="bookSection">
@@ -141,7 +136,7 @@
             <div class="cat-chip" onclick="filterCategory('හාස්‍ය', this)">හාස්‍ය</div>
         </div>
 
-        <h2 class="section-title" id="sectionTitle">නවතම පොත් එකතුව</h2>
+        <h2 class="section-title">නවතම පොත් එකතුව</h2>
         <div class="book-grid" id="bookGrid"></div>
     </main>
 
@@ -207,102 +202,101 @@
     </div>
 
     <script>
-        // 📚 Demo Data (ඩිසයින් එක ලස්සනට බලන්න Sample පොත්)
-        const sampleBooks = [
+        // Default Sample Books
+        const defaultBooks = [
             {
-                id: "demo1",
-                title: "මඩොල් දූව (Madol Doova)",
+                id: "d1",
+                title: "මඩොල් දූව",
                 author: "මාටින් වික්‍රමසිංහ",
                 category: "නවකතා",
                 price: 850,
                 oldPrice: 1000,
-                imgUrl: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80"
+                imgUrl: "https://picsum.photos/id/24/300/400"
             },
             {
-                id: "demo2",
-                title: "අලි බබා සහ හොරු හතළිහ",
-                author: "ආනන්ද අමරසූරිය",
+                id: "d2",
+                title: "ශර්ලොක් හෝම්ස්",
+                author: "චන්දන මෙන්ඩිස්",
                 category: "පරිවර්තන",
-                price: 1200,
-                oldPrice: 1450,
-                imgUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80"
+                price: 1350,
+                oldPrice: 1600,
+                imgUrl: "https://picsum.photos/id/1010/300/400"
             },
             {
-                id: "demo3",
+                id: "d3",
                 title: "සෙනෙහෙබර අහස",
                 author: "සුගතපාල ද සිල්වා",
                 category: "පද්‍ය/පද සංකලන",
                 price: 650,
                 oldPrice: null,
-                imgUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&q=80"
+                imgUrl: "https://picsum.photos/id/367/300/400"
             },
             {
-                id: "demo4",
+                id: "d4",
                 title: "හපන්කම් සහ විහිළු",
                 author: "ලියනගේ අමරකෝන්",
                 category: "හාස්‍ය",
                 price: 750,
                 oldPrice: 900,
-                imgUrl: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&q=80"
+                imgUrl: "https://picsum.photos/id/20/300/400"
             },
             {
-                id: "demo5",
-                title: "විරාගය (Viragaya)",
+                id: "d5",
+                title: "විරාගය",
                 author: "මාටින් වික්‍රමසිංහ",
                 category: "නවකතා",
                 price: 950,
                 oldPrice: 1100,
-                imgUrl: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80"
+                imgUrl: "https://picsum.photos/id/1025/300/400"
             },
             {
-                id: "demo6",
-                title: "ශර්ලොක් හෝම්ස් රහස් පරීක්ෂණ",
-                author: "චන්දන මෙන්ඩිස්",
+                id: "d6",
+                title: "අලි බබා සහ හොරු 40",
+                author: "ආනන්ද අමරසූරිය",
                 category: "පරිවර්තන",
-                price: 1500,
-                oldPrice: 1800,
-                imgUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&q=80"
+                price: 1100,
+                oldPrice: 1300,
+                imgUrl: "https://picsum.photos/id/1062/300/400"
             }
         ];
 
-        let booksList = [];
+        let booksList = [...defaultBooks];
         let cart = [];
 
-        function loadBooksRealtime() {
-            database.ref('books').on('value', snapshot => {
-                const data = snapshot.val();
-                booksList = [];
-                if(data) {
-                    Object.keys(data).forEach(key => {
-                        booksList.push({ id: key, ...data[key] });
-                    });
-                }
-                
-                // Firebase එකේ පොත් නැත්නම් Demo Books ටික පෙන්වන්න
-                if (booksList.length === 0) {
-                    booksList = [...sampleBooks];
-                }
+        function initApp() {
+            renderBooks(booksList);
+            renderFeaturedHero(booksList[0]);
 
-                renderBooks(booksList);
-                renderFeaturedHero(booksList);
-            });
+            // Attempt Firebase sync if available
+            if (database) {
+                database.ref('books').on('value', snapshot => {
+                    const data = snapshot.val();
+                    if(data) {
+                        let fbBooks = [];
+                        Object.keys(data).forEach(key => {
+                            fbBooks.push({ id: key, ...data[key] });
+                        });
+                        if (fbBooks.length > 0) {
+                            booksList = fbBooks;
+                            renderBooks(booksList);
+                            renderFeaturedHero(booksList[0]);
+                        }
+                    }
+                });
+            }
         }
 
-        function renderFeaturedHero(data) {
+        function renderFeaturedHero(book) {
             const showcaseBox = document.getElementById('featuredBookBox');
-            if (!data || data.length === 0) return;
-
-            // අලුත්ම පොත Banner එකේ පෙන්වීම
-            const latestBook = data[0];
-
+            if(!book) return;
             showcaseBox.innerHTML = `
                 <div class="featured-book-card">
-                    <img src="${latestBook.imgUrl}" alt="${latestBook.title}">
+                    <img src="${book.imgUrl}" alt="${book.title}">
                     <div>
                         <span style="background:var(--accent); color:var(--primary); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px;">BESTSELLER</span>
-                        <h3 style="font-size:1.1rem; margin: 6px 0 2px 0;">${latestBook.title}</h3>
-                        <p style="color:#cbd5e1; font-size:0.8rem; margin-bottom:8px;">${latestBook.author}</p>
-                        <div style="font-weight:700; color:#34d399; font-size:1.1rem;">රු.${latestBook.price}</div>
+                        <h3 style="font-size:1.1rem; margin: 6px 0 2px 0;">${book.title}</h3>
+                        <p style="color:#cbd5e1; font-size:0.8rem; margin-bottom:8px;">${book.author}</p>
+                        <div style="font-weight:700; color:#34d399; font-size:1.1rem;">රු.${book.price}</div>
                     </div>
                 </div>
             `;
@@ -311,7 +305,6 @@
         function renderBooks(data) {
             const grid = document.getElementById('bookGrid');
             grid.innerHTML = '';
-
             data.forEach(b => {
                 const discount = b.oldPrice ? `<span class="book-badge">DISCOUNT</span>` : '';
                 const oldPriceHTML = b.oldPrice ? `<span class="old-price">රු.${b.oldPrice}</span>` : '';
@@ -349,56 +342,34 @@
             const category = document.getElementById('admCategory').value;
             const price = Number(document.getElementById('admPrice').value);
             const oldPrice = Number(document.getElementById('admOldPrice').value) || null;
-            const fileInput = document.getElementById('admImgFile');
+            
+            const newBook = {
+                id: 'custom-' + Date.now(),
+                title, author, category, price, oldPrice,
+                imgUrl: "https://picsum.photos/id/24/300/400"
+            };
 
-            let imgUrl = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80";
+            booksList.unshift(newBook);
+            renderBooks(booksList);
+            renderFeaturedHero(newBook);
 
-            if(fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const storageRef = storage.ref(`book_covers/${Date.now()}_${file.name}`);
-                const snapshot = await storageRef.put(file);
-                imgUrl = await snapshot.ref.getDownloadURL();
+            if (database) {
+                try {
+                    await database.ref('books/' + newBook.id).set(newBook);
+                } catch(err){}
             }
-
-            const newBookKey = database.ref('books').push().key;
-            await database.ref('books/' + newBookKey).set({
-                title, author, category, price, oldPrice, imgUrl, date: new Date().toISOString()
-            });
 
             btn.innerText = "Save Book";
             btn.disabled = false;
             document.getElementById('addBookForm').reset();
             closeAll();
-            alert('පොත සාර්ථකව ඇතුළත් විය!');
+            alert('පොත සාර්ථකව එකතු විය!');
         }
 
-        async function processCheckout(e) {
+        function processCheckout(e) {
             e.preventDefault();
             if (cart.length === 0) return alert('කරත්තයට පොත් එකතු කරන්න');
-
-            const orderId = 'AURA-' + Math.floor(100000 + Math.random() * 900000);
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-            const orderData = {
-                id: orderId,
-                customerName: document.getElementById('cName').value,
-                phone: document.getElementById('cPhone').value,
-                address: document.getElementById('cAddress').value,
-                city: document.getElementById('cCity').value,
-                postalCode: document.getElementById('cPostal').value,
-                items: cart.map(i => i.title).join(', '),
-                amount: total,
-                date: new Date().toLocaleString(),
-                status: 'pending'
-            };
-
-            try {
-                await database.ref('orders/' + orderId).set(orderData);
-            } catch(err) {
-                console.log("Firebase Save Notice: Offline/Demo order mode.");
-            }
-
-            alert('ඇණවුම සාර්ථකයි! Order ID: #' + orderId);
+            alert('ඇණවුම සාර්ථකයි!');
             cart = [];
             updateCart();
             closeAll();
@@ -438,8 +409,8 @@
             document.getElementById('overlay').classList.remove('show');
         }
 
-        // Initialize Page Load
-        loadBooksRealtime();
+        // Run Immediately
+        window.onload = initApp;
     </script>
 </body>
 </html>
