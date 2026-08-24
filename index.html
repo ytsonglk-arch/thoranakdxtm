@@ -89,7 +89,7 @@
         .drawer-header { padding: 1.2rem; background: var(--primary); color:white; display:flex; justify-content:space-between; }
         .drawer-body { padding:1rem; flex:1; overflow-y:auto; }
 
-        .modal { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:500px; background:white; border-radius:16px; padding:2rem; z-index:2500; display:none; max-height: 90vh; overflow-y: auto; }
+        .modal { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:500px; background:white; border-radius:16px; padding:2rem; z-index:2500; display:none; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal.show { display:block; }
         .overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1500; display:none; }
         .overlay.show { display:block; }
@@ -97,6 +97,12 @@
         .form-group { margin-bottom: 1rem; }
         .form-group label { display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; }
         .form-group input, .form-group select, .form-group textarea { width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:8px; }
+
+        /* Custom Success Popup Style */
+        .success-box { text-align: center; padding: 1rem; }
+        .success-icon { font-size: 3rem; color: #16a34a; margin-bottom: 10px; }
+        .success-box h3 { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; }
+        .success-box p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -120,7 +126,7 @@
 
     <section class="featured-showcase">
         <div class="featured-content">
-            <h1>නවතම සහ විශේෂිත <span>ප්‍රකාශන</span></h1>
+            <h1>විශේෂිත <span>ප්‍රකාශන</span></h1>
             <p>විශේෂ වට්ටම් යටතේ අදම ඔබගේ ප්‍රියතම පොත ඇණවුම් කරවා ගන්න.</p>
             <button class="add-cart-btn" style="width: auto; padding: 0.8rem 2rem; background: var(--accent); color: var(--primary);" onclick="document.getElementById('bookSection').scrollIntoView()">පොත් නරඹන්න</button>
         </div>
@@ -201,9 +207,28 @@
         </form>
     </div>
 
+    <!-- Success Popup Modal -->
+    <div class="modal" id="successModal">
+        <div class="success-box">
+            <div class="success-icon">✅</div>
+            <h3>ඇණවුම සාර්ථකයි!</h3>
+            <p>ඔබගේ ඇණවුම සාර්ථකව ලැබී ඇත. ඉක්මනින්ම ඔබව සම්බන්ධ කරගන්නෙමු.</p>
+            <button onclick="closeAll()" class="add-cart-btn" style="background:var(--primary);">හරි (OK)</button>
+        </div>
+    </div>
+
     <script>
-        // Default Sample Books
+        // Default Sample Books (අසම්පූර්ණ නමින් පොතක් ද එකතු කර ඇත)
         const defaultBooks = [
+            {
+                id: "d0",
+                title: "අසම්පූර්ණ (Asampurna)",
+                author: "විශේෂ සංස්කරණය",
+                category: "නවකතා",
+                price: 550,
+                oldPrice: 800,
+                imgUrl: "https://picsum.photos/id/10/300/400"
+            },
             {
                 id: "d1",
                 title: "මඩොල් දූව",
@@ -248,15 +273,6 @@
                 price: 950,
                 oldPrice: 1100,
                 imgUrl: "https://picsum.photos/id/1025/300/400"
-            },
-            {
-                id: "d6",
-                title: "අලි බබා සහ හොරු 40",
-                author: "ආනන්ද අමරසූරිය",
-                category: "පරිවර්තන",
-                price: 1100,
-                oldPrice: 1300,
-                imgUrl: "https://picsum.photos/id/1062/300/400"
             }
         ];
 
@@ -265,9 +281,8 @@
 
         function initApp() {
             renderBooks(booksList);
-            renderFeaturedHero(booksList[0]);
+            renderFeaturedHero(booksList[0]); // මෙහි දැන් "අසම්පූර්ණ" පොත උඩින්ම පෙන්වයි
 
-            // Attempt Firebase sync if available
             if (database) {
                 database.ref('books').on('value', snapshot => {
                     const data = snapshot.val();
@@ -293,7 +308,7 @@
                 <div class="featured-book-card">
                     <img src="${book.imgUrl}" alt="${book.title}">
                     <div>
-                        <span style="background:var(--accent); color:var(--primary); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px;">BESTSELLER</span>
+                        <span style="background:var(--accent); color:var(--primary); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px;">FEATURED</span>
                         <h3 style="font-size:1.1rem; margin: 6px 0 2px 0;">${book.title}</h3>
                         <p style="color:#cbd5e1; font-size:0.8rem; margin-bottom:8px;">${book.author}</p>
                         <div style="font-weight:700; color:#34d399; font-size:1.1rem;">රු.${book.price}</div>
@@ -369,10 +384,13 @@
         function processCheckout(e) {
             e.preventDefault();
             if (cart.length === 0) return alert('කරත්තයට පොත් එකතු කරන්න');
-            alert('ඇණවුම සාර්ථකයි!');
+            
             cart = [];
             updateCart();
             closeAll();
+            
+            // ඇණවුම සාර්ථක වූ පසු ලස්සන Success Popup එක පෙන්වීම
+            openModal('successModal');
         }
 
         function filterCategory(cat, el) {
@@ -409,7 +427,6 @@
             document.getElementById('overlay').classList.remove('show');
         }
 
-        // Run Immediately
         window.onload = initApp;
     </script>
 </body>
